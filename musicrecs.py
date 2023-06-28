@@ -21,7 +21,7 @@ choice = input("Would you like to see new recommended tracks or artists? : ")
 if choice == "tracks":
     utrack = input("Enter a song title: ")
     uartist = input("Enter the artist of the track: ")
-    # inputtrack = network.get_track(uartist, utrack)
+    
     inputtrack = pylast.Track(uartist, utrack, network)
     similar = inputtrack.get_similar(10)
     
@@ -37,15 +37,12 @@ if choice == "tracks":
             name = track.get_name()
             artist = track.get_artist()
             print(f"{name} by {artist}")
-    # URL = f"http://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist={uartist}&track={utrack}&api_key={API_KEY}&format=json"
-    # track = network.get_track(usertrack, userartist)
-    # response = requests.get(URL)
-    # print(response.text)
+    
 elif choice == "artists":
     artist = input("Enter an artist name: ")
 
     inputartist = pylast.Artist(artist, network)
-    similar  = inputartist.get_similar(10)
+    similar  = inputartist.get_similar()
 
     if similar == []:
         print("Sorry, we don't seem to have data on this artist.")
@@ -54,9 +51,14 @@ elif choice == "artists":
 
         Here are some similiar artists!:
         """)
+        counter = 10
+       
         for i in similar:
             artist = i.item
-            print(f"{artist}")
+            if counter > 0 and "&" not in str(artist):
+                counter -= 1
+                print(f"{artist}")
+                    
 
 # Now you can use that object everywhere
 # track = network.get_track("beabadoobee", "Apple Cider")
