@@ -1,4 +1,5 @@
 import pylast
+import requests
 
 # You have to have your own unique two values for API_KEY and API_SECRET
 # Obtain yours from https://www.last.fm/api/account/create for Last.fm
@@ -15,13 +16,55 @@ network = pylast.LastFMNetwork(
     username=username,
     password_hash=password_hash,
 )
+choice = input("Would you like to see new recommended tracks or artists? : ")
+
+if choice == "tracks":
+    utrack = input("Enter a song title: ")
+    uartist = input("Enter the artist of the track: ")
+    # inputtrack = network.get_track(uartist, utrack)
+    inputtrack = pylast.Track(uartist, utrack, network)
+    similar = inputtrack.get_similar(10)
+    
+    if similar == []:
+        print("Sorry, we don't seem to have data on this track.")
+    else:
+        print("""
+
+        Here are some similiar tracks!:
+        """)
+        for i in similar:
+            track = i.item
+            name = track.get_name()
+            artist = track.get_artist()
+            print(f"{name} by {artist}")
+    # URL = f"http://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist={uartist}&track={utrack}&api_key={API_KEY}&format=json"
+    # track = network.get_track(usertrack, userartist)
+    # response = requests.get(URL)
+    # print(response.text)
+elif choice == "artists":
+    artist = input("Enter an artist name: ")
+
+    inputartist = pylast.Artist(artist, network)
+    similar  = inputartist.get_similar(10)
+
+    if similar == []:
+        print("Sorry, we don't seem to have data on this artist.")
+    else:
+        print("""
+
+        Here are some similiar artists!:
+        """)
+        for i in similar:
+            artist = i.item
+            print(f"{artist}")
 
 # Now you can use that object everywhere
 track = network.get_track("beabadoobee", "Apple Cider")
 track.love()
 track.add_tags(("awesome", "favorite"))
 
-print(track)
+# print(track)
+
 
 # Type help(pylast.LastFMNetwork) or help(pylast) in a Python interpreter
 # to get more help about anything and see examples of how it works
