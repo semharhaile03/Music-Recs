@@ -59,9 +59,9 @@ elif choice == "artists":
             print(f"{artist}")
 
 # Now you can use that object everywhere
-track = network.get_track("beabadoobee", "Apple Cider")
-track.love()
-track.add_tags(("awesome", "favorite"))
+# track = network.get_track("beabadoobee", "Apple Cider")
+# track.love()
+# track.add_tags(("awesome", "favorite"))
 
 # print(track)
 
