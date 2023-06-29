@@ -24,7 +24,11 @@ ans = True
 
 while ans:
     choice = input(
-        "\nWelcome to MusicRecs! Would you like to: \n[1] Search for tracks \n[2] Search for artists \n[3] View your library \n[4] Exit\n ")
+        """Welcome to MusicRecs! Would you like to: 
+          [1] Search for tracks 
+          [2] Search for artists 
+          [3] View your library 
+          [4] Exit""")
 
     if choice == "1":
         utrack = input("Enter a song title: ")
