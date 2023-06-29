@@ -10,6 +10,7 @@ class TestViewLibrary(unittest.TestCase):
                                   "Artist":
                                   ["Artist X", "Artist Y", "Artist X"]})
         expected_result = pd.DataFrame(
-            {"Title": ["Song A", "Song B"], "Artist": ["Artist X", "Artist Y"]})
+            {"Title": ["Song A", "Song B"],
+             "Artist": ["Artist X", "Artist Y"]})
         result = view_library(favorites)
         assert_frame_equal(result, expected_result)
