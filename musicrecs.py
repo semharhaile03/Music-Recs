@@ -1,5 +1,7 @@
 import pylast
 import requests
+import sqlalchemy as db
+import pandas as pd
 
 # You have to have your own unique two values for API_KEY and API_SECRET
 # Obtain yours from https://www.last.fm/api/account/create for Last.fm
@@ -18,7 +20,10 @@ network = pylast.LastFMNetwork(
 )
 choice = input("Would you like to see new recommended tracks or artists? : ")
 
+
+
 if choice == "tracks":
+    datadf = pd.DataFrame({"Title" : [], "Artist" : []})
     utrack = input("Enter a song title: ")
     uartist = input("Enter the artist of the track: ")
     
@@ -36,9 +41,10 @@ if choice == "tracks":
             track = i.item
             name = track.get_name()
             artist = track.get_artist()
-            print(f"{name} by {artist}")
+            datadf.loc[len(datadf)] = [str(name), str(artist)]
     
 elif choice == "artists":
+    datadf = pd.DataFrame({"Artist" : []})
     artist = input("Enter an artist name: ")
 
     inputartist = pylast.Artist(artist, network)
@@ -57,8 +63,13 @@ elif choice == "artists":
             artist = i.item
             if counter > 0 and "&" not in str(artist):
                 counter -= 1
-                print(f"{artist}")
+                datadf.loc[len(datadf)] = [str(artist)]
                     
+engine = db.create_engine('sqlite:///datadf.db')
+datadf.to_sql("recommended", con=engine, if_exists='replace', index=False)
+with engine.connect() as connection:
+   query_result = connection.execute(db.text("SELECT * FROM recommended;")).fetchall()
+   print(pd.DataFrame(query_result))
 
 # Now you can use that object everywhere
 # track = network.get_track("beabadoobee", "Apple Cider")
