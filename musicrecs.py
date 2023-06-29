@@ -18,65 +18,94 @@ network = pylast.LastFMNetwork(
     username=username,
     password_hash=password_hash,
 )
-choice = input("Would you like to see new recommended tracks or artists? : ")
 
+favorites = pd.DataFrame(columns=["Title", "Artist"])
+ans = True
 
-if choice == "tracks":
-    datadf = pd.DataFrame({"Title": [], "Artist": []})
-    utrack = input("Enter a song title: ")
-    uartist = input("Enter the artist of the track: ")
+while ans:
+    choice = input(
+        "\nWelcome to MusicRecs! Would you like to: \n[1] Search for tracks \n[2] Search for artists \n[3] View your library \n[4] Exit\n ")
 
-    inputtrack = pylast.Track(uartist, utrack, network)
-    similar = inputtrack.get_similar(10)
+    if choice == "1":
+        utrack = input("Enter a song title: ")
+        uartist = input("Enter the artist of the track: ")
 
-    if similar == []:
-        print("Sorry, we don't seem to have data on this track.")
-    else:
-        print("""
+        inputtrack = pylast.Track(uartist, utrack, network)
 
-        Here are some similiar tracks!:
-        """)
-        for i in similar:
-            track = i.item
-            name = track.get_name()
-            artist = track.get_artist()
-            datadf.loc[len(datadf)] = [str(name), str(artist)]
+        similar = inputtrack.get_similar(10)
+        similartracks = {}
 
-elif choice == "artists":
-    datadf = pd.DataFrame({"Artist": []})
-    artist = input("Enter an artist name: ")
+        if similar == []:
+            print("Sorry, we don't seem to have data on this track.")
+        else:
+            print("""
 
-    inputartist = pylast.Artist(artist, network)
-    similar = inputartist.get_similar()
+            Here are some similiar tracks!:
+            """)
+            count = 0
 
-    if similar == []:
-        print("Sorry, we don't seem to have data on this artist.")
-    else:
-        print("""
+            for i in similar:
+                track = i.item
+                name = track.get_name()
+                artist = track.get_artist()
 
-        Here are some similiar artists!:
-        """)
-        counter = 10
+                similartracks.update({str(count): [name, artist]})
+                print(f"[{count}] : {name} by {artist}")
 
-        for i in similar:
-            artist = i.item
-            if counter > 0 and "&" not in str(artist):
-                counter -= 1
-                datadf.loc[len(datadf)] = [str(artist)]
+                count += 1
 
-engine = db.create_engine('sqlite:///datadf.db')
-datadf.to_sql("recommended", con=engine, if_exists='replace', index=False)
-with engine.connect() as connection:
-    query_result = connection.execute(
-        db.text("SELECT * FROM recommended;")).fetchall()
-    print(pd.DataFrame(query_result))
+        favs = input(
+            "\n Which songs would you like to add? Please type their numbers with no spaces: ")
+        print(favs)
+        favorites = pd.DataFrame(columns=["Title", "Artist"], dtype=str)
+        for i in range(len(favs)):
 
-# Now you can use that object everywhere
-# track = network.get_track("beabadoobee", "Apple Cider")
-# track.love()
-# track.add_tags(("awesome", "favorite"))
+            favorites.loc[len(favorites)] = {"Title": similartracks.get(favs[i])[
+                0], "Artist": similartracks.get(favs[i])[1].get_name()}
 
-# print(track)
+        print("Songs added!")
+
+    elif choice == "2":
+        artist = input("Enter an artist name: ")
+
+        inputartist = pylast.Artist(artist, network)
+        similar = inputartist.get_similar()
+
+        if similar == []:
+            print("Sorry, we don't seem to have data on this artist.")
+        else:
+            print("""
+
+            Here are some similiar artists!:
+            """)
+            counter = 10
+
+            for i in similar:
+                artist = i.item
+                if counter > 0 and "&" not in str(artist):
+                    counter -= 1
+                    print(f"{artist}")
+
+    elif choice == "3":
+        if favorites.empty:
+            print("Add songs to your library!")
+        else:
+            engine = db.create_engine('sqlite:///favorites.db')
+            favorites.to_sql(
+                "song",
+                con=engine,
+                if_exists='append',
+                index=False)
+            with engine.connect() as connection:
+                query_result = connection.execute(
+                    db.text("SELECT * FROM song;")).fetchall()
+                print(pd.DataFrame(query_result))
+
+    elif choice == "4":
+        engine = db.create_engine('sqlite:///favorites.db')
+        favorites = pd.DataFrame(columns=["Title", "Artist"])
+        favorites.to_sql("song", con=engine, if_exists='replace', index=False)
+        exit()
 
 
 # Type help(pylast.LastFMNetwork) or help(pylast) in a Python interpreter
