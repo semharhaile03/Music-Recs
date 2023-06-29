@@ -19,6 +19,7 @@ network = pylast.LastFMNetwork(
     password_hash=password_hash,
 )
 
+
 favorites = pd.DataFrame(columns=["Title", "Artist"])
 ans = True
 
