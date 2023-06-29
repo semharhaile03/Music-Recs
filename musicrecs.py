@@ -68,8 +68,9 @@ Type their numbers with no spaces: """)
         favorites = pd.DataFrame(columns=["Title", "Artist"], dtype=str)
         for i in range(len(favs)):
 
-            favorites.loc[len(favorites)] = {"Title": similartracks.get(favs[i])[
-                0], "Artist": similartracks.get(favs[i])[1].get_name()}
+            favorites.loc[len(favorites)] = {
+                "Title": similartracks.get(favs[i])[0],
+                "Artist": similartracks.get(favs[i])[1].get_name()}
 
         print("Songs added!")
 
