@@ -19,27 +19,6 @@ network = pylast.LastFMNetwork(
     password_hash=password_hash,
 )
 
-# Creates library for user to store favorited songs
-
-
-def view_library(favorites):
-    # If user didn't favorite any songs will return a message
-    if favorites.empty:
-        print("Add songs to your library!")
-    else:
-        # Returns favorited songs using an SQL query
-        engine = db.create_engine('sqlite:///favorites.db')
-        favorites.to_sql(
-            "song",
-            con=engine,
-            if_exists='append',
-            index=False)
-        with engine.connect() as connection:
-            query_result = connection.execute(
-                db.text("SELECT DISTINCT * FROM song;")).fetchall()
-            print(pd.DataFrame(query_result))
-
-
 favorites = pd.DataFrame(columns=["Title", "Artist"])
 ans = True
 
@@ -120,7 +99,21 @@ Type their numbers with no spaces: """)
 
     elif choice == "3":
         # Shows user their favorited songs
-        view_library(favorites)
+        # If user didn't favorite any songs will return a message
+        if favorites.empty:
+            print("Add songs to your library!")
+        else:
+            # Returns favorited songs using an SQL query
+            engine = db.create_engine('sqlite:///favorites.db')
+            favorites.to_sql(
+                "song",
+                con=engine,
+                if_exists='append',
+                index=False)
+            with engine.connect() as connection:
+                query_result = connection.execute(
+                    db.text("SELECT DISTINCT * FROM song;")).fetchall()
+                print(pd.DataFrame(query_result))
 
     elif choice == "4":
         # Refreshes favorites library and stops program
@@ -128,7 +121,6 @@ Type their numbers with no spaces: """)
         favorites = pd.DataFrame(columns=["Title", "Artist"])
         favorites.to_sql("song", con=engine, if_exists='replace', index=False)
         exit()
-
 
 # Type help(pylast.LastFMNetwork) or help(pylast) in a Python interpreter
 # to get more help about anything and see examples of how it works
