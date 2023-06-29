@@ -19,9 +19,30 @@ network = pylast.LastFMNetwork(
     password_hash=password_hash,
 )
 
+# Creates library for user to store favorited songs
+
+
+def view_library(favorites):
+    # If user didn't favorite any songs will return a message
+    if favorites.empty:
+        print("Add songs to your library!")
+    else:
+        # Returns favorited songs using an SQL query
+        engine = db.create_engine('sqlite:///favorites.db')
+        favorites.to_sql(
+            "song",
+            con=engine,
+            if_exists='append',
+            index=False)
+        with engine.connect() as connection:
+            query_result = connection.execute(
+                db.text("SELECT DISTINCT * FROM song;")).fetchall()
+            print(pd.DataFrame(query_result))
+
 
 favorites = pd.DataFrame(columns=["Title", "Artist"])
 ans = True
+
 
 while ans:
     choice = input(
@@ -76,6 +97,7 @@ Type their numbers with no spaces: """)
         print("Songs added!")
 
     elif choice == "2":
+        # Shows user similar artists to the one they input
         artist = input("Enter an artist name: ")
 
         inputartist = pylast.Artist(artist, network)
@@ -97,21 +119,11 @@ Type their numbers with no spaces: """)
                     print(f"{artist}")
 
     elif choice == "3":
-        if favorites.empty:
-            print("Add songs to your library!")
-        else:
-            engine = db.create_engine('sqlite:///favorites.db')
-            favorites.to_sql(
-                "song",
-                con=engine,
-                if_exists='append',
-                index=False)
-            with engine.connect() as connection:
-                query_result = connection.execute(
-                    db.text("SELECT * FROM song;")).fetchall()
-                print(pd.DataFrame(query_result))
+        # Shows user their favorited songs
+        view_library(favorites)
 
     elif choice == "4":
+        # Refreshes favorites library and stops program
         engine = db.create_engine('sqlite:///favorites.db')
         favorites = pd.DataFrame(columns=["Title", "Artist"])
         favorites.to_sql("song", con=engine, if_exists='replace', index=False)
