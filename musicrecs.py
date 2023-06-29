@@ -25,12 +25,12 @@ ans = True
 while ans:
     choice = input(
         """
-        Welcome to MusicRecs! Would you like to:
-        [1] Search for tracks
-        [2] Search for artists
-        [3] View your library
-        [4] Exit
-        """)
+Welcome to MusicRecs! Would you like to:
+[1] Search for tracks
+[2] Search for artists
+[3] View your library
+[4] Exit
+ """)
 
     if choice == "1":
         utrack = input("Enter a song title: ")
@@ -61,7 +61,9 @@ while ans:
                 count += 1
 
         favs = input(
-            "\n Which songs would you like to add? Type their numbers with no spaces: ")
+            """
+Which songs would you like to add?
+Type their numbers with no spaces: """)
         print(favs)
         favorites = pd.DataFrame(columns=["Title", "Artist"], dtype=str)
         for i in range(len(favs)):
