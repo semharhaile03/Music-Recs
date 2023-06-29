@@ -21,15 +21,14 @@ network = pylast.LastFMNetwork(
 choice = input("Would you like to see new recommended tracks or artists? : ")
 
 
-
 if choice == "tracks":
-    datadf = pd.DataFrame({"Title" : [], "Artist" : []})
+    datadf = pd.DataFrame({"Title": [], "Artist": []})
     utrack = input("Enter a song title: ")
     uartist = input("Enter the artist of the track: ")
-    
+
     inputtrack = pylast.Track(uartist, utrack, network)
     similar = inputtrack.get_similar(10)
-    
+
     if similar == []:
         print("Sorry, we don't seem to have data on this track.")
     else:
@@ -42,13 +41,13 @@ if choice == "tracks":
             name = track.get_name()
             artist = track.get_artist()
             datadf.loc[len(datadf)] = [str(name), str(artist)]
-    
+
 elif choice == "artists":
-    datadf = pd.DataFrame({"Artist" : []})
+    datadf = pd.DataFrame({"Artist": []})
     artist = input("Enter an artist name: ")
 
     inputartist = pylast.Artist(artist, network)
-    similar  = inputartist.get_similar()
+    similar = inputartist.get_similar()
 
     if similar == []:
         print("Sorry, we don't seem to have data on this artist.")
@@ -58,18 +57,19 @@ elif choice == "artists":
         Here are some similiar artists!:
         """)
         counter = 10
-       
+
         for i in similar:
             artist = i.item
             if counter > 0 and "&" not in str(artist):
                 counter -= 1
                 datadf.loc[len(datadf)] = [str(artist)]
-                    
+
 engine = db.create_engine('sqlite:///datadf.db')
 datadf.to_sql("recommended", con=engine, if_exists='replace', index=False)
 with engine.connect() as connection:
-   query_result = connection.execute(db.text("SELECT * FROM recommended;")).fetchall()
-   print(pd.DataFrame(query_result))
+    query_result = connection.execute(
+        db.text("SELECT * FROM recommended;")).fetchall()
+    print(pd.DataFrame(query_result))
 
 # Now you can use that object everywhere
 # track = network.get_track("beabadoobee", "Apple Cider")
